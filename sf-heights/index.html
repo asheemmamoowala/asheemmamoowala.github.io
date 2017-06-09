@@ -1,0 +1,118 @@
+<html>
+<script src='https://api.mapbox.com/mapbox-gl-js/v0.35.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v0.35.1/mapbox-gl.css' rel='stylesheet' />
+<style>
+    #features {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 300px;
+        overflow: auto;
+        background: rgba(255, 255, 255, 0.8);
+    }
+    
+    #map canvas {
+        cursor: crosshair;
+    }
+</style>
+<head>
+    <title>San Francisco Allowed Bulk Heights </title>
+</head>
+<body>
+<div id='map' style='width: 100%; height: 100%;'></div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYXNoZWVtbSIsImEiOiJjajF0c3l1YWMwMDFlMzJsaG12amc0dXF3In0.L2SrgjgzM_1DoZIvTmhuUQ';
+    const mapVars = {
+        buldingOpacity: 0.5,
+        allowedOpacity: 0.25,
+        minZoom: 13,
+        'source-layer': 'sfbuildings-0dgjd9'
+    }
+    
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v9',
+        zoom: 17,
+         pitch: 45,
+        // bearing: -17.6,
+        center: [-122.4194, 37.7749]
+    });
+    map.addControl(new mapboxgl.NavigationControl());
+    map.addControl(new mapboxgl.ScaleControl());
+    map.setMaxBounds([[-122.514949713, 37.708090756], [-122.356969006, 37.8120157892]]);
+    map.on('load', function () {
+        map.addSource('sfheight', {
+            type: 'vector',
+            url: 'mapbox://asheemm.1oybba5a'
+        });
+        map.addLayer({
+            'id': 'good-height',
+            'source': 'sfheight',
+            'source-layer': 'sfbuildings-0dgjd9',
+            'type': 'fill-extrusion',
+            'minzoom': mapVars.minZoom,
+            'filter': ['<=', 'height_delta', 2.75],
+            'paint': {
+                'fill-extrusion-height': {
+                    'type': 'identity',
+                    'property': 'height'
+                },
+                'fill-extrusion-color': 'green',
+                'fill-extrusion-base': 0,
+                'fill-opacity': mapVars.buldingOpacity
+            }
+        });
+        map.addLayer({
+            'id': 'potential-height',
+            'source': 'sfheight',
+            'source-layer': 'sfbuildings-0dgjd9',
+            'filter': ['>', 'height_delta', 2.75],
+            'type': 'fill-extrusion',
+            'minzoom': mapVars.minZoom,
+            'paint': {
+                'fill-extrusion-color': '#aaa',
+                'fill-extrusion-height': {
+                    'type': 'identity',
+                    'property': 'height'
+                },
+                'fill-extrusion-base': 0,
+                'fill-extrusion-opacity': mapVars.buldingOpacity
+            },
+            'layout': { 
+                'visibility': 'visible'
+            }
+        });
+        map.addLayer({
+            'id': 'allowed-height',
+            'source': 'sfheight',
+            'source-layer': 'sfbuildings-0dgjd9',
+            'type': 'fill-extrusion',
+            'filter': ['>', 'height_delta', 2.75],
+            'minzoom': mapVars.minZoom,
+            'paint': {
+                'fill-extrusion-color': {
+                    "property": "height_delta",
+                    "stops": [
+                        [0, "green"],
+                        [5, "yellow"],
+                        [15, "gold"],
+                        [25, "orange"],
+                        [50, "red"]
+                    ]
+                },
+                'fill-extrusion-height': {
+                    'type': 'identity',
+                    'property': 'allowed_height'
+                },
+                'fill-extrusion-base': {
+                    'type': 'identity',
+                    'property': 'height'
+                },
+                'fill-extrusion-opacity': mapVars.allowedOpacity
+            }
+        });
+    });
+</script>
+</body>
+</html>
