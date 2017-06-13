@@ -26,16 +26,17 @@
     const mapVars = {
         buldingOpacity: 0.25,
         allowedOpacity: 0.5,
-        minZoom: 13,
+        minZoom: 16,
         heightFilter: 2.75
     }
     
     var map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v9',
-        zoom: 17,
-         pitch: 45,
-        // bearing: -17.6,
+        zoom: 15,
+        minZoom: 15,
+        maxZoom: 20,
+        pitch: 45,
         center: [-122.4194, 37.7749]
     });
     map.addControl(new mapboxgl.NavigationControl());
@@ -94,10 +95,10 @@
                 'fill-extrusion-color': {
                     "property": "height_delta",
                     "stops": [
-                        [1, "green"],
-                        [5, "yellow"],
-                        [15, "gold"],
-                        [25, "orange"],
+                        [mapVars.heightFilter, "yellow"],
+                        [5, "gold"],
+                        [15, "orange"],
+                        [25, "orangered"],
                         [50, "red"]
                     ]
                 },
@@ -110,6 +111,27 @@
                     'property': 'height'
                 },
                 'fill-extrusion-opacity': mapVars.allowedOpacity
+            }
+        });
+        map.addLayer({
+            'id': 'allowed-height-2d',
+            'source': 'sfheight',
+            'source-layer': 'sfbuildings-0dgjd9',
+            'type': 'fill',
+                'filter': ['>', 'height_delta', mapVars.heightFilter],
+            'maxzoom': mapVars.minZoom,
+            'paint': {
+                'fill-color': {
+                    "property": "height_delta",
+                    "stops": [
+                        [mapVars.heightFilter, "yellow"],
+                        [5, "gold"],
+                        [15, "orange"],
+                        [25, "orangered"],
+                        [50, "red"]
+                    ]
+                },
+                'fill-opacity': mapVars.allowedOpacity
             }
         });
     });
