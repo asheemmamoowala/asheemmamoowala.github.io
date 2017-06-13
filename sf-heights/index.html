@@ -24,10 +24,10 @@
 <script>
     mapboxgl.accessToken = 'pk.eyJ1IjoiYXNoZWVtbSIsImEiOiJjajF0c3l1YWMwMDFlMzJsaG12amc0dXF3In0.L2SrgjgzM_1DoZIvTmhuUQ';
     const mapVars = {
-        buldingOpacity: 0.5,
-        allowedOpacity: 0.25,
+        buldingOpacity: 0.25,
+        allowedOpacity: 0.5,
         minZoom: 13,
-        'source-layer': 'sfbuildings-0dgjd9'
+        heightFilter: 2.75
     }
     
     var map = new mapboxgl.Map({
@@ -52,7 +52,7 @@
             'source-layer': 'sfbuildings-0dgjd9',
             'type': 'fill-extrusion',
             'minzoom': mapVars.minZoom,
-            'filter': ['<=', 'height_delta', 2.75],
+            'filter': ['<=', 'height_delta', mapVars.heightFilter],
             'paint': {
                 'fill-extrusion-height': {
                     'type': 'identity',
@@ -60,14 +60,14 @@
                 },
                 'fill-extrusion-color': 'green',
                 'fill-extrusion-base': 0,
-                'fill-opacity': mapVars.buldingOpacity
+                'fill-extrusion-opacity': mapVars.buldingOpacity
             }
         });
         map.addLayer({
             'id': 'potential-height',
             'source': 'sfheight',
             'source-layer': 'sfbuildings-0dgjd9',
-            'filter': ['>', 'height_delta', 2.75],
+            'filter': ['>', 'height_delta', mapVars.heightFilter],
             'type': 'fill-extrusion',
             'minzoom': mapVars.minZoom,
             'paint': {
@@ -88,13 +88,13 @@
             'source': 'sfheight',
             'source-layer': 'sfbuildings-0dgjd9',
             'type': 'fill-extrusion',
-            'filter': ['>', 'height_delta', 2.75],
+            'filter': ['>', 'height_delta', mapVars.heightFilter],
             'minzoom': mapVars.minZoom,
             'paint': {
                 'fill-extrusion-color': {
                     "property": "height_delta",
                     "stops": [
-                        [0, "green"],
+                        [1, "green"],
                         [5, "yellow"],
                         [15, "gold"],
                         [25, "orange"],
